@@ -1,0 +1,10 @@
+{
+  "name": "Shyan's Vault",
+  "short_name": "Shyan's Vault",
+  "description": "Personal vault for apps, games, socials, and notes.",
+  "start_url": "/shyans-vault/",
+  "scope": "/shyans-vault/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16"
+}
