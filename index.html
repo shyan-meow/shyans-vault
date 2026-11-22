@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shyan's Vault - Personal Credential & Note Vault</title>
+    <link rel="manifest" href="/shyans-vault/manifest.json">
     
     <!-- PWA Primary Color -->
     <meta name="theme-color" content="#10b981">
@@ -15,6 +16,11 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/shyans-vault/sw.js').catch(console.error);
+  });
+}
         tailwind.config = {
             darkMode: 'class',
             theme: {
