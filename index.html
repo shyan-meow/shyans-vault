@@ -8,16 +8,17 @@
     <!-- PWA & Theme Metadata -->
     <meta name="theme-color" content="#090d16">
     <meta name="description" content="Personal encrypted credential and note vault for Shyan.">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Shyan's Vault">
 
     <!-- External Manifest Link (For GitHub Pages Deployment) -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
 
     <!-- Favicon & Touch Icon Data URI Fallback (Works in Preview & Local) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%2310b981'><path d='M256 64s160 80 160 200v140c0 40-160 80-160 80S96 444 96 404V264C96 144 256 64 256 64z' fill='none' stroke='%2310b981' stroke-width='32'/><circle cx='256' cy='240' r='32' fill='%2310b981'/><path d='M256 264v48' stroke='%2310b981' stroke-width='24' stroke-linecap='round'/></svg>">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="./icon-192.png">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -76,7 +77,6 @@
         .mono-font {
             font-family: 'JetBrains Mono', monospace;
         }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -91,7 +91,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #334155;
         }
-        /* Glassmorphism styling */
         .glass-panel {
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(16px);
@@ -117,12 +116,12 @@
 <body class="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-emerald-500 selection:text-slate-950">
 
     <!-- APP UPDATE NOTIFICATION BANNER (Triggered when sw.js updates) -->
-    <div id="sw-update-banner" class="hidden sticky top-0 z-50 bg-gradient-to-r from-cyan-600 via-emerald-600 to-indigo-600 text-white px-4 py-2.5 shadow-xl text-xs font-semibold flex items-center justify-between">
+    <div id="sw-update-banner" class="hidden sticky top-0 z-50 bg-gradient-to-r from-cyan-600 via-emerald-600 to-indigo-600 text-white px-4 py-2.5 shadow-xl text-xs font-semibold flex items-center justify-between gap-3">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-arrows-rotate animate-spin text-sm"></i>
-            <span>An update is available for Shyan's Vault! Reload to update smoothly (your saved entries stay safe).</span>
+            <span>An update is available for Shyan's Vault! Reload to apply (your saved entries stay safe).</span>
         </div>
-        <button onclick="reloadServiceWorker()" class="px-3 py-1 bg-slate-950/80 hover:bg-slate-950 text-emerald-400 rounded-lg border border-emerald-400/30 text-xs font-bold transition-all">
+        <button onclick="reloadServiceWorker()" class="px-3 py-1 bg-slate-950/80 hover:bg-slate-950 text-emerald-400 rounded-lg border border-emerald-400/30 text-xs font-bold transition-all shrink-0">
             Reload App
         </button>
     </div>
@@ -141,13 +140,15 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
-                        Shyan's Vault
-                    </h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+                            Shyan's Vault
+                        </h1>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">v2.1</span>
+                    </div>
                     <div class="flex items-center gap-2 text-[10px] text-slate-400">
                         <span class="uppercase tracking-widest font-semibold text-slate-400">Personal Vault</span>
                         <span class="text-slate-600">•</span>
-                        <!-- Storage status indicator -->
                         <span id="storage-status-chip" class="flex items-center gap-1 text-emerald-400 font-mono">
                             <i class="fa-solid fa-database text-[9px]"></i>
                             <span id="storage-status-text">Synced</span>
@@ -158,23 +159,19 @@
 
             <!-- Header Action Controls -->
             <div class="flex items-center gap-2 sm:gap-3">
-                <!-- PWA Install Button (Dynamic) -->
                 <button id="pwa-install-btn" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all">
                     <i class="fa-solid fa-download"></i>
                     <span class="hidden sm:inline">Install App</span>
                 </button>
 
-                <!-- Generator Quick Launch -->
                 <button onclick="openGeneratorModal()" title="Password Generator" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-slate-700 transition-all">
                     <i class="fa-solid fa-key"></i>
                 </button>
 
-                <!-- Settings & Export -->
                 <button onclick="openSettingsModal()" title="Settings & Data Backup" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-slate-700 transition-all">
                     <i class="fa-solid fa-gear"></i>
                 </button>
 
-                <!-- Lock Vault Button -->
                 <button onclick="lockVault()" title="Lock Vault" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-all text-xs font-semibold">
                     <i class="fa-solid fa-lock"></i>
                     <span class="hidden md:inline">Lock</span>
@@ -186,9 +183,24 @@
     <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
 
+        <!-- 7-DAY BACKUP REMINDER BANNER -->
+        <div id="backup-reminder-banner" class="hidden rounded-2xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 text-xs text-amber-200 font-medium">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-sm shrink-0"></i>
+                <span>It has been 7+ days since your last JSON backup. Export a copy so your data stays safe across devices and major updates.</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="exportVaultBackup()" class="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-bold transition-all">
+                    Backup Now
+                </button>
+                <button onclick="dismissBackupReminder()" class="px-2.5 py-1.5 rounded-lg text-amber-200/80 hover:text-white text-xs font-semibold transition-all">
+                    Later
+                </button>
+            </div>
+        </div>
+
         <!-- CONTROLS & FILTER BAR -->
         <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            <!-- Search Bar -->
             <div class="relative flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                 <input type="text" id="search-input" placeholder="Search by title, email, username or notes..." 
@@ -198,7 +210,6 @@
                 </button>
             </div>
 
-            <!-- Primary Action: Add Entry Button -->
             <button onclick="openAddEntryModal()" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]">
                 <i class="fa-solid fa-plus text-xs"></i>
                 <span>Add Entry</span>
@@ -207,12 +218,8 @@
 
         <!-- CATEGORIES & FAVORITES TABS -->
         <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 overflow-x-auto no-scrollbar gap-2">
-            <!-- Category Pills -->
-            <div class="flex items-center gap-2" id="category-pills-container">
-                <!-- Javascript will inject categories here -->
-            </div>
+            <div class="flex items-center gap-2" id="category-pills-container"></div>
 
-            <!-- Sort Indicator -->
             <div class="text-xs text-slate-400 flex items-center gap-1.5 whitespace-nowrap pl-4">
                 <i class="fa-solid fa-arrow-down-a-z text-emerald-400"></i>
                 <span>Sorted: <strong class="text-slate-300">Favorites first, then A–Z</strong></span>
@@ -220,9 +227,7 @@
         </div>
 
         <!-- ENTRIES GRID -->
-        <div id="entries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Entries injected by JavaScript -->
-        </div>
+        <div id="entries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
         <!-- EMPTY STATE DISPLAY -->
         <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center px-4">
@@ -255,11 +260,9 @@
     <!-- 1. LOCK SCREEN OVERLAY -->
     <div id="lock-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4 transition-opacity duration-300">
         <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-2xl flex flex-col items-center text-center relative overflow-hidden" id="lock-card">
-            <!-- Ambient Glow -->
             <div class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Vault Logo Emblem -->
             <div class="w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-slate-900 to-cyan-500/20 border border-emerald-500/40 flex items-center justify-center animate-pulse-glow">
                 <svg class="w-10 h-10 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -280,7 +283,6 @@
                     </button>
                 </div>
 
-                <!-- Setup Mode Confirm Password (hidden by default) -->
                 <div id="confirm-password-container" class="relative w-full hidden">
                     <input type="password" id="confirm-password-input" placeholder="Confirm Master Password"
                         class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-center tracking-widest transition-all">
@@ -300,7 +302,6 @@
     <!-- 2. ADD / EDIT ENTRY MODAL -->
     <div id="entry-modal" class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
         <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative my-8">
-            <!-- Close Button -->
             <button onclick="closeEntryModal()" class="absolute right-5 top-5 text-slate-400 hover:text-slate-100 transition-colors">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
@@ -313,7 +314,6 @@
             <form id="entry-form" onsubmit="handleSaveEntry(event)" class="space-y-4">
                 <input type="hidden" id="entry-id">
 
-                <!-- Title & Category Row -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">App / Service Name *</label>
@@ -331,7 +331,6 @@
                     </div>
                 </div>
 
-                <!-- Username / Handle -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Username / Handle</label>
                     <div class="relative">
@@ -341,7 +340,6 @@
                     </div>
                 </div>
 
-                <!-- Email Address -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email Address</label>
                     <div class="relative">
@@ -351,7 +349,7 @@
                     </div>
                 </div>
 
-                <!-- Password with generator button -->
+                <!-- Password + Strength Meter -->
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Password</label>
@@ -360,22 +358,26 @@
                         </button>
                     </div>
                     <div class="relative">
-                        <input type="password" id="entry-password" placeholder="••••••••••••"
+                        <input type="password" id="entry-password" oninput="updatePasswordStrength()" placeholder="••••••••••••"
                             class="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 mono-font text-sm focus:outline-none focus:border-emerald-500 transition-all">
                         <button type="button" onclick="togglePasswordVisibility('entry-password', 'entry-pwd-icon')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
                             <i class="fa-solid fa-eye text-sm" id="entry-pwd-icon"></i>
                         </button>
                     </div>
+                    <div class="mt-2 flex items-center justify-between gap-3">
+                        <div class="flex-1 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                            <div id="pwd-strength-bar" class="h-full w-0 bg-slate-600 transition-all duration-300"></div>
+                        </div>
+                        <span id="pwd-strength-label" class="text-[11px] font-semibold text-slate-500">No password</span>
+                    </div>
                 </div>
 
-                <!-- Notepad / Notes multiline -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Small Notepad / Recovery Notes</label>
                     <textarea id="entry-notes" rows="3" placeholder="Security questions, 2FA recovery codes, pin codes, or notes..."
                         class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm focus:outline-none focus:border-emerald-500 transition-all resize-y"></textarea>
                 </div>
 
-                <!-- Favorite Toggle Checkbox -->
                 <div class="flex items-center gap-3 pt-1">
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="entry-favorite" class="sr-only peer">
@@ -386,7 +388,6 @@
                     </span>
                 </div>
 
-                <!-- Modal Actions -->
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
                     <button type="button" onclick="closeEntryModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all">
                         Cancel
@@ -417,7 +418,6 @@
             </div>
 
             <div class="space-y-3.5">
-                <!-- Username field -->
                 <div id="view-username-container" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                     <div>
                         <span class="text-[10px] text-slate-500 uppercase font-semibold block">Username / Handle</span>
@@ -428,7 +428,6 @@
                     </button>
                 </div>
 
-                <!-- Email field -->
                 <div id="view-email-container" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                     <div>
                         <span class="text-[10px] text-slate-500 uppercase font-semibold block">Email</span>
@@ -439,7 +438,6 @@
                     </button>
                 </div>
 
-                <!-- Password field -->
                 <div id="view-password-container" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                     <div class="flex-1 pr-2">
                         <span class="text-[10px] text-slate-500 uppercase font-semibold block">Password</span>
@@ -455,7 +453,6 @@
                     </div>
                 </div>
 
-                <!-- Notepad Section -->
                 <div>
                     <span class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Notepad / Notes</span>
                     <div id="view-notes" class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 min-h-[80px] whitespace-pre-wrap leading-relaxed mono-font">
@@ -492,7 +489,6 @@
                 <span>Password Generator</span>
             </h3>
 
-            <!-- Generated Output Display -->
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-between mb-5">
                 <span id="gen-result" class="mono-font text-base sm:text-lg font-semibold text-emerald-400 tracking-wider break-all select-all"></span>
                 <button onclick="copyGeneratedPassword()" class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all shrink-0 ml-2">
@@ -500,7 +496,6 @@
                 </button>
             </div>
 
-            <!-- Controls -->
             <div class="space-y-4">
                 <div>
                     <div class="flex justify-between text-xs font-semibold text-slate-400 mb-2">
@@ -555,11 +550,10 @@
             </h3>
 
             <div class="space-y-6">
-                <!-- Dual Storage Status Card -->
                 <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                         <span>Storage & Protection Status</span>
-                        <span class="text-emerald-400 text-[10px] font-mono">v2 Dual-Mirror</span>
+                        <span class="text-emerald-400 text-[10px] font-mono">v2.1 Dual-Mirror</span>
                     </h4>
                     <div class="grid grid-cols-2 gap-3 text-xs mb-3">
                         <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
@@ -571,12 +565,12 @@
                             <span id="idb-status-val" class="font-bold text-emerald-400">Synced</span>
                         </div>
                     </div>
+                    <p id="last-backup-status" class="text-[11px] text-slate-400 mb-1.5">Last backup: Never</p>
                     <p class="text-[11px] text-slate-500 leading-relaxed">
-                        Your vault data is mirrored across two separate storage layers. If an app update or browser cache clear wipes one layer, the app auto-recovers from the mirror on next launch.
+                        Your vault data is mirrored across `localStorage` and `IndexedDB`. Updating code on GitHub does not wipe your saved entries.
                     </p>
                 </div>
 
-                <!-- Change Master Password Section -->
                 <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Security Settings</h4>
                     <form onsubmit="handleChangeMasterPassword(event)" class="space-y-3">
@@ -594,7 +588,6 @@
                     </form>
                 </div>
 
-                <!-- Encrypted Data Backup & Sync -->
                 <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Backup & Device Transfer</h4>
                     <p class="text-xs text-slate-500 mb-4">Export your entries to a JSON backup file or restore onto another device without wiping your current master password.</p>
@@ -629,19 +622,17 @@
     <!-- JAVASCRIPT LOGIC & DUAL-STORAGE ENGINE     -->
     <!-- ========================================== -->
     <script>
-        // --- CONSTANTS & KEYS ---
         const LS_ENTRIES_KEY = "shyans_vault_entries_v1";
         const LS_MASTER_HASH_KEY = "shyans_vault_master_hash_v1";
-        const LS_META_KEY = "shyans_vault_meta_v1";
+        const LS_LAST_BACKUP_KEY = "shyans_vault_last_backup_v1";
 
         const IDB_NAME = "ShyansVaultDB";
         const IDB_VERSION = 2;
         const IDB_STORE_ENTRIES = "entries";
         const IDB_STORE_SETTINGS = "settings";
 
-        const CATEGORIES = ["All", "Apps", "Games", "Socials", "Others"];
+        const CATEGORIES = ["All", "Favorites", "Apps", "Games", "Socials", "Others"];
 
-        // --- GLOBAL APP STATE ---
         let vaultEntries = [];
         let masterHash = null;
         let isUnlocked = false;
@@ -651,8 +642,8 @@
         let deferredPrompt = null;
         let activeSwRegistration = null;
         let dbInstance = null;
+        let reminderDismissedThisSession = false;
 
-        // --- PURE JS SHA-256 FALLBACK & CRYPTO HELPER ---
         function sha256Fallback(ascii) {
             function rightRotate(value, amount) {
                 return (value >>> amount) | (value << (32 - amount));
@@ -740,15 +731,10 @@
             return sha256Fallback(salted);
         }
 
-        // --- INDEXEDDB STORAGE ENGINE (DUAL-MIRROR PROTECTION) ---
         function initIndexedDB() {
-            return new Promise((resolve, reject) => {
-                if (!window.indexedDB) {
-                    console.warn("IndexedDB not supported in this browser environment.");
-                    return resolve(null);
-                }
+            return new Promise((resolve) => {
+                if (!window.indexedDB) return resolve(null);
                 const request = indexedDB.open(IDB_NAME, IDB_VERSION);
-
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(IDB_STORE_ENTRIES)) {
@@ -758,27 +744,12 @@
                         db.createObjectStore(IDB_STORE_SETTINGS, { keyPath: "key" });
                     }
                 };
-
                 request.onsuccess = (e) => {
                     dbInstance = e.target.result;
                     resolve(dbInstance);
                 };
-
-                request.onerror = (e) => {
-                    console.error("IndexedDB initialization error", e);
-                    resolve(null);
-                };
+                request.onerror = () => resolve(null);
             });
-        }
-
-        function idbPutEntry(entry) {
-            if (!dbInstance) return;
-            try {
-                const tx = dbInstance.transaction(IDB_STORE_ENTRIES, "readwrite");
-                tx.objectStore(IDB_STORE_ENTRIES).put(entry);
-            } catch (err) {
-                console.error("IDB Put Entry Error", err);
-            }
         }
 
         function idbDeleteEntry(id) {
@@ -818,8 +789,7 @@
                 if (!dbInstance) return resolve([]);
                 try {
                     const tx = dbInstance.transaction(IDB_STORE_ENTRIES, "readonly");
-                    const store = tx.objectStore(IDB_STORE_ENTRIES);
-                    const req = store.getAll();
+                    const req = tx.objectStore(IDB_STORE_ENTRIES).getAll();
                     req.onsuccess = () => resolve(req.result || []);
                     req.onerror = () => resolve([]);
                 } catch (err) {
@@ -833,8 +803,7 @@
                 if (!dbInstance) return resolve(null);
                 try {
                     const tx = dbInstance.transaction(IDB_STORE_SETTINGS, "readonly");
-                    const store = tx.objectStore(IDB_STORE_SETTINGS);
-                    const req = store.get(key);
+                    const req = tx.objectStore(IDB_STORE_SETTINGS).get(key);
                     req.onsuccess = () => resolve(req.result ? req.result.value : null);
                     req.onerror = () => resolve(null);
                 } catch (err) {
@@ -843,11 +812,9 @@
             });
         }
 
-        // --- DUAL-MIRROR SYNCHRONIZATION ---
         async function syncAndLoadVaultData() {
             await initIndexedDB();
 
-            // Request browser persistent storage
             if (navigator.storage && navigator.storage.persist) {
                 navigator.storage.persist().then(granted => {
                     const statusText = document.getElementById('storage-status-text');
@@ -857,7 +824,6 @@
                 }).catch(() => {});
             }
 
-            // Load Master Password Hash (Cross-check LS and IDB)
             let lsHash = localStorage.getItem(LS_MASTER_HASH_KEY);
             let idbHash = await idbGetSetting("master_hash");
 
@@ -869,7 +835,14 @@
                 localStorage.setItem(LS_MASTER_HASH_KEY, idbHash);
             }
 
-            // Load Entries (Cross-check LS and IDB)
+            let lsBackup = localStorage.getItem(LS_LAST_BACKUP_KEY);
+            let idbBackup = await idbGetSetting("last_backup");
+            if (!lsBackup && idbBackup) {
+                localStorage.setItem(LS_LAST_BACKUP_KEY, String(idbBackup));
+            } else if (lsBackup && !idbBackup) {
+                idbSaveSetting("last_backup", Number(lsBackup));
+            }
+
             let lsEntries = [];
             try {
                 const raw = localStorage.getItem(LS_ENTRIES_KEY);
@@ -887,14 +860,12 @@
                 vaultEntries = idbEntries;
                 localStorage.setItem(LS_ENTRIES_KEY, JSON.stringify(vaultEntries));
             } else if (lsEntries.length > 0 && idbEntries.length > 0) {
-                // Merge strategies by entry ID
                 const entryMap = new Map();
                 idbEntries.forEach(item => entryMap.set(item.id, item));
-                lsEntries.forEach(item => entryMap.set(item.id, item)); // latest LS wins on tie
+                lsEntries.forEach(item => entryMap.set(item.id, item));
                 vaultEntries = Array.from(entryMap.values());
                 saveEntriesToDualStorage();
             } else {
-                // Initial Sample Seed if brand new
                 vaultEntries = getSampleInitialEntries();
                 saveEntriesToDualStorage();
             }
@@ -909,6 +880,16 @@
             masterHash = hash;
             localStorage.setItem(LS_MASTER_HASH_KEY, hash);
             idbSaveSetting("master_hash", hash);
+        }
+
+        function saveLastBackupTimestamp(ts) {
+            localStorage.setItem(LS_LAST_BACKUP_KEY, String(ts));
+            idbSaveSetting("last_backup", ts);
+        }
+
+        function getLastBackupTimestamp() {
+            const raw = localStorage.getItem(LS_LAST_BACKUP_KEY);
+            return raw ? Number(raw) : null;
         }
 
         function getSampleInitialEntries() {
@@ -949,7 +930,6 @@
             ];
         }
 
-        // --- INITIALIZATION ---
         window.addEventListener('DOMContentLoaded', async () => {
             setupPWAAndServiceWorker();
             renderCategoryPills();
@@ -957,6 +937,7 @@
             updateGenerator();
 
             await syncAndLoadVaultData();
+            updateBackupReminderUI();
 
             if (!masterHash) {
                 showSetupScreen();
@@ -965,10 +946,9 @@
             }
         });
 
-        // --- SERVICE WORKER & PWA SETUP ---
         function setupPWAAndServiceWorker() {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+                navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
                     .then(reg => {
                         activeSwRegistration = reg;
                         reg.addEventListener('updatefound', () => {
@@ -976,7 +956,6 @@
                             if (newWorker) {
                                 newWorker.addEventListener('statechange', () => {
                                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        // Show app update notification banner
                                         document.getElementById('sw-update-banner')?.classList.remove('hidden');
                                     }
                                 });
@@ -1014,53 +993,61 @@
             window.location.reload();
         }
 
-        // --- SECURITY / UNLOCK LOGIC ---
+        function updateBackupReminderUI() {
+            const lastBackup = getLastBackupTimestamp();
+            const banner = document.getElementById('backup-reminder-banner');
+            const statusEl = document.getElementById('last-backup-status');
+
+            if (statusEl) {
+                statusEl.textContent = lastBackup
+                    ? `Last backup: ${new Date(lastBackup).toLocaleDateString()}`
+                    : "Last backup: Never";
+            }
+
+            if (!banner) return;
+            const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+            const isOverdue = !lastBackup || (Date.now() - lastBackup) > sevenDaysMs;
+
+            if (isOverdue && !reminderDismissedThisSession) {
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function dismissBackupReminder() {
+            reminderDismissedThisSession = true;
+            document.getElementById('backup-reminder-banner')?.classList.add('hidden');
+        }
+
         function showSetupScreen() {
             const lockScreen = document.getElementById('lock-screen');
-            const heading = document.getElementById('lock-screen-heading');
-            const subheading = document.getElementById('lock-screen-subheading');
-            const confirmContainer = document.getElementById('confirm-password-container');
-            const confirmInput = document.getElementById('confirm-password-input');
-            const pwdInput = document.getElementById('master-password-input');
-            const unlockBtn = document.getElementById('unlock-btn');
-            const errorMsg = document.getElementById('lock-error');
-
-            heading.textContent = "Welcome, Shyan!";
-            subheading.textContent = "Create your Master Password to protect your personal vault.";
-            confirmContainer.classList.remove('hidden');
-            confirmInput.required = true;
-            pwdInput.value = '';
-            confirmInput.value = '';
-            unlockBtn.textContent = "Create Vault & Unlock";
-            errorMsg.classList.add('hidden');
-            
+            document.getElementById('lock-screen-heading').textContent = "Welcome, Shyan!";
+            document.getElementById('lock-screen-subheading').textContent = "Create your Master Password to protect your personal vault.";
+            document.getElementById('confirm-password-container').classList.remove('hidden');
+            document.getElementById('confirm-password-input').required = true;
+            document.getElementById('master-password-input').value = '';
+            document.getElementById('confirm-password-input').value = '';
+            document.getElementById('unlock-btn').textContent = "Create Vault & Unlock";
+            document.getElementById('lock-error').classList.add('hidden');
             lockScreen.style.display = 'flex';
             lockScreen.classList.remove('hidden');
-            setTimeout(() => pwdInput.focus(), 100);
+            setTimeout(() => document.getElementById('master-password-input').focus(), 100);
         }
 
         function showLockScreen() {
             const lockScreen = document.getElementById('lock-screen');
-            const heading = document.getElementById('lock-screen-heading');
-            const subheading = document.getElementById('lock-screen-subheading');
-            const confirmContainer = document.getElementById('confirm-password-container');
-            const confirmInput = document.getElementById('confirm-password-input');
-            const pwdInput = document.getElementById('master-password-input');
-            const unlockBtn = document.getElementById('unlock-btn');
-            const errorMsg = document.getElementById('lock-error');
-
-            heading.textContent = "Welcome Back, Shyan";
-            subheading.textContent = "Enter your Master Password to access your vault.";
-            confirmContainer.classList.add('hidden');
-            confirmInput.required = false;
-            confirmInput.value = '';
-            pwdInput.value = '';
-            unlockBtn.textContent = "Unlock Vault";
-            errorMsg.classList.add('hidden');
-
+            document.getElementById('lock-screen-heading').textContent = "Welcome Back, Shyan";
+            document.getElementById('lock-screen-subheading').textContent = "Enter your Master Password to access your personal vault.";
+            document.getElementById('confirm-password-container').classList.add('hidden');
+            document.getElementById('confirm-password-input').required = false;
+            document.getElementById('confirm-password-input').value = '';
+            document.getElementById('master-password-input').value = '';
+            document.getElementById('unlock-btn').textContent = "Unlock Vault";
+            document.getElementById('lock-error').classList.add('hidden');
             lockScreen.style.display = 'flex';
             lockScreen.classList.remove('hidden');
-            setTimeout(() => pwdInput.focus(), 100);
+            setTimeout(() => document.getElementById('master-password-input').focus(), 100);
         }
 
         async function handleUnlockSubmit(e) {
@@ -1068,11 +1055,9 @@
             const passwordInput = document.getElementById('master-password-input');
             const confirmInput = document.getElementById('confirm-password-input');
             const lockCard = document.getElementById('lock-card');
-            
             const pwd = (passwordInput.value || '').trim();
 
             if (!masterHash) {
-                // Setup mode
                 const confirmPwd = (confirmInput.value || '').trim();
                 if (pwd.length < 4) {
                     showLockError("Master password must be at least 4 characters.");
@@ -1087,7 +1072,6 @@
                 unlockSuccess();
                 showToast("Master Password created successfully!");
             } else {
-                // Unlock mode
                 const hashCheck = await hashPassword(pwd);
                 if (hashCheck === masterHash) {
                     unlockSuccess();
@@ -1110,11 +1094,10 @@
             const lockScreen = document.getElementById('lock-screen');
             lockScreen.style.display = 'none';
             lockScreen.classList.add('hidden');
-
             document.getElementById('master-password-input').value = '';
             document.getElementById('confirm-password-input').value = '';
             document.getElementById('lock-error').classList.add('hidden');
-            
+            renderCategoryPills();
             renderEntries();
         }
 
@@ -1124,31 +1107,36 @@
             showToast("Vault Locked");
         }
 
-        // --- SORTING ALGORITHM (FAVORITES FIRST, THEN A-Z) ---
         function getSortedEntries(entriesList) {
             return [...entriesList].sort((a, b) => {
-                // Rule 1: Favorites first
                 if (a.isFavorite && !b.isFavorite) return -1;
                 if (!a.isFavorite && b.isFavorite) return 1;
-
-                // Rule 2: Alphabetical A-Z by Title
                 return (a.title || '').localeCompare((b.title || ''), undefined, { sensitivity: 'base' });
             });
         }
 
-        // --- RENDERING CATEGORIES & CARDS ---
+        function getCategoryCount(cat) {
+            if (cat === "All") return vaultEntries.length;
+            if (cat === "Favorites") return vaultEntries.filter(e => !!e.isFavorite).length;
+            return vaultEntries.filter(e => e.category === cat).length;
+        }
+
         function renderCategoryPills() {
             const container = document.getElementById('category-pills-container');
             container.innerHTML = CATEGORIES.map(cat => {
                 const isActive = activeCategoryFilter === cat;
+                const count = getCategoryCount(cat);
                 return `
                     <button onclick="setCategoryFilter('${cat}')" 
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                             isActive 
                             ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' 
                             : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
                         }">
-                        ${cat}
+                        <span>${cat === "Favorites" ? "★ Favorites" : cat}</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] ${
+                            isActive ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400'
+                        }">${count}</span>
                     </button>
                 `;
             }).join('');
@@ -1163,13 +1151,8 @@
         function setupSearchListener() {
             const searchInput = document.getElementById('search-input');
             const clearBtn = document.getElementById('clear-search');
-
             searchInput.addEventListener('input', (e) => {
-                if (e.target.value) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
-                }
+                clearBtn.classList.toggle('hidden', !e.target.value);
                 renderEntries();
             });
         }
@@ -1183,17 +1166,20 @@
 
         function renderEntries() {
             if (!isUnlocked) return;
+            renderCategoryPills();
 
             const grid = document.getElementById('entries-grid');
             const emptyState = document.getElementById('empty-state');
             const searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
 
-            // Filter entries
-            let filtered = vaultEntries.filter(entry => {
-                const matchesCategory = activeCategoryFilter === "All" || entry.category === activeCategoryFilter;
-                
+            const filtered = vaultEntries.filter(entry => {
+                const matchesCategory =
+                    activeCategoryFilter === "All" ||
+                    (activeCategoryFilter === "Favorites" && !!entry.isFavorite) ||
+                    entry.category === activeCategoryFilter;
+
                 const matchesSearch = !searchQuery || 
-                    entry.title.toLowerCase().includes(searchQuery) ||
+                    (entry.title || '').toLowerCase().includes(searchQuery) ||
                     (entry.username && entry.username.toLowerCase().includes(searchQuery)) ||
                     (entry.email && entry.email.toLowerCase().includes(searchQuery)) ||
                     (entry.notes && entry.notes.toLowerCase().includes(searchQuery));
@@ -1201,14 +1187,12 @@
                 return matchesCategory && matchesSearch;
             });
 
-            // Mandatory Sorting: Favorites first, then A-Z
             const sorted = getSortedEntries(filtered);
 
             if (sorted.length === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 emptyState.classList.add('flex');
-                
                 if (searchQuery || activeCategoryFilter !== "All") {
                     document.getElementById('empty-title').textContent = "No matching entries";
                     document.getElementById('empty-description').textContent = "Try clearing your search query or changing category filter.";
@@ -1221,7 +1205,6 @@
 
             emptyState.classList.add('hidden');
             emptyState.classList.remove('flex');
-
             grid.innerHTML = sorted.map(entry => createEntryCardHTML(entry)).join('');
         }
 
@@ -1232,7 +1215,6 @@
             return `
                 <div class="glass-card rounded-2xl p-4 flex flex-col justify-between relative group">
                     <div>
-                        <!-- Top Header Row: Icon, Title, Category & Favorite Toggle -->
                         <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-10 h-10 rounded-xl ${categoryBadgeColor.bg} flex items-center justify-center text-sm font-bold text-slate-100 shrink-0 border ${categoryBadgeColor.border}">
@@ -1248,13 +1230,11 @@
                                 </div>
                             </div>
 
-                            <!-- Favorite Star Button -->
                             <button onclick="toggleFavorite('${entry.id}')" title="${entry.isFavorite ? 'Unstar' : 'Favorite'}" class="p-1.5 rounded-lg text-slate-500 hover:text-amber-400 transition-all shrink-0">
                                 <i class="${entry.isFavorite ? 'fa-solid fa-star text-amber-400 scale-110' : 'fa-regular fa-star'} text-base"></i>
                             </button>
                         </div>
 
-                        <!-- Credentials Summary -->
                         <div class="space-y-2 my-3 text-xs">
                             ${entry.username ? `
                                 <div class="flex items-center justify-between bg-slate-950/70 px-3 py-1.5 rounded-xl border border-slate-800/80">
@@ -1285,15 +1265,16 @@
                         </div>
                     </div>
 
-                    <!-- Card Action Footer -->
                     <div class="flex items-center justify-between pt-3 mt-1 border-t border-slate-800/60 text-xs">
-                        <!-- Notepad Badge indicator -->
                         <button onclick="openViewModal('${entry.id}')" class="text-slate-400 hover:text-slate-200 text-[11px] font-medium flex items-center gap-1.5">
                             <i class="fa-regular fa-note-sticky ${entry.notes ? 'text-cyan-400' : 'text-slate-600'}"></i>
                             <span>${entry.notes ? 'View Notes' : 'Details'}</span>
                         </button>
 
                         <div class="flex items-center gap-1">
+                            <button onclick="duplicateEntry('${entry.id}')" title="Duplicate Entry" class="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition-all">
+                                <i class="fa-regular fa-clone text-xs"></i>
+                            </button>
                             <button onclick="openEditModal('${entry.id}')" title="Edit Entry" class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-all">
                                 <i class="fa-solid fa-pen text-xs"></i>
                             </button>
@@ -1306,7 +1287,6 @@
             `;
         }
 
-        // --- ICON & STYLING HELPERS ---
         function getCategoryIconSymbol(category, title) {
             const t = (title || '').toLowerCase();
             if (t.includes('instagram')) return 'fa-brands fa-instagram';
@@ -1339,7 +1319,6 @@
             }
         }
 
-        // --- FAVORITE TOGGLE ---
         function toggleFavorite(id) {
             const entry = vaultEntries.find(e => e.id === id);
             if (entry) {
@@ -1350,11 +1329,62 @@
             }
         }
 
-        // --- ADD & EDIT MODAL LOGIC ---
+        function duplicateEntry(id) {
+            const original = vaultEntries.find(e => e.id === id);
+            if (!original) return;
+            const copy = {
+                ...original,
+                id: crypto.randomUUID(),
+                title: `${original.title} (Copy)`,
+                isFavorite: false,
+                createdAt: Date.now()
+            };
+            vaultEntries.push(copy);
+            saveEntriesToDualStorage();
+            renderEntries();
+            showToast(`Duplicated "${original.title}"`);
+        }
+
+        function updatePasswordStrength() {
+            const pwd = document.getElementById('entry-password').value || '';
+            const bar = document.getElementById('pwd-strength-bar');
+            const label = document.getElementById('pwd-strength-label');
+
+            if (!pwd) {
+                bar.style.width = '0%';
+                bar.className = 'h-full w-0 bg-slate-600 transition-all duration-300';
+                label.textContent = 'No password';
+                label.className = 'text-[11px] font-semibold text-slate-500';
+                return;
+            }
+
+            let score = 0;
+            if (pwd.length >= 8) score++;
+            if (pwd.length >= 12) score++;
+            if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+            if (/\d/.test(pwd)) score++;
+            if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+            const levels = [
+                { width: '20%', color: 'bg-rose-500', text: 'Weak', textClass: 'text-rose-400' },
+                { width: '40%', color: 'bg-amber-500', text: 'Fair', textClass: 'text-amber-400' },
+                { width: '65%', color: 'bg-cyan-400', text: 'Good', textClass: 'text-cyan-400' },
+                { width: '85%', color: 'bg-emerald-400', text: 'Strong', textClass: 'text-emerald-400' },
+                { width: '100%', color: 'bg-emerald-300', text: 'Fortress', textClass: 'text-emerald-300' }
+            ];
+
+            const lvl = levels[Math.min(Math.max(score - 1, 0), levels.length - 1)];
+            bar.style.width = lvl.width;
+            bar.className = `h-full ${lvl.color} transition-all duration-300`;
+            label.textContent = lvl.text;
+            label.className = `text-[11px] font-semibold ${lvl.textClass}`;
+        }
+
         function openAddEntryModal() {
             document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-circle-plus text-emerald-400"></i> Add New Entry`;
             document.getElementById('entry-form').reset();
             document.getElementById('entry-id').value = '';
+            updatePasswordStrength();
             document.getElementById('entry-modal').classList.remove('hidden');
             document.getElementById('entry-modal').classList.add('flex');
             document.getElementById('entry-title').focus();
@@ -1373,6 +1403,7 @@
             document.getElementById('entry-password').value = entry.password || '';
             document.getElementById('entry-notes').value = entry.notes || '';
             document.getElementById('entry-favorite').checked = !!entry.isFavorite;
+            updatePasswordStrength();
 
             document.getElementById('entry-modal').classList.remove('hidden');
             document.getElementById('entry-modal').classList.add('flex');
@@ -1395,7 +1426,6 @@
             const isFavorite = document.getElementById('entry-favorite').checked;
 
             if (id) {
-                // Update existing
                 const index = vaultEntries.findIndex(item => item.id === id);
                 if (index !== -1) {
                     vaultEntries[index] = {
@@ -1406,13 +1436,11 @@
                 }
                 showToast("Entry updated successfully!");
             } else {
-                // Create new
-                const newEntry = {
+                vaultEntries.push({
                     id: crypto.randomUUID(),
                     title, category, username, email, password, notes, isFavorite,
                     createdAt: Date.now()
-                };
-                vaultEntries.push(newEntry);
+                });
                 showToast("New entry added!");
             }
 
@@ -1424,7 +1452,6 @@
         function deleteEntry(id) {
             const entry = vaultEntries.find(e => e.id === id);
             if (!entry) return;
-
             vaultEntries = vaultEntries.filter(e => e.id !== id);
             saveEntriesToDualStorage();
             idbDeleteEntry(id);
@@ -1432,7 +1459,6 @@
             showToast(`Deleted "${entry.title}"`);
         }
 
-        // --- VIEW DETAIL MODAL LOGIC ---
         function openViewModal(id) {
             const entry = vaultEntries.find(e => e.id === id);
             if (!entry) return;
@@ -1442,11 +1468,8 @@
 
             document.getElementById('view-title').textContent = entry.title;
             document.getElementById('view-category').textContent = entry.category;
-            
-            const iconSymbol = getCategoryIconSymbol(entry.category, entry.title);
-            document.getElementById('view-icon-bg').innerHTML = `<i class="${iconSymbol}"></i>`;
+            document.getElementById('view-icon-bg').innerHTML = `<i class="${getCategoryIconSymbol(entry.category, entry.title)}"></i>`;
 
-            // Username
             const uContainer = document.getElementById('view-username-container');
             if (entry.username) {
                 uContainer.classList.remove('hidden');
@@ -1455,7 +1478,6 @@
                 uContainer.classList.add('hidden');
             }
 
-            // Email
             const eContainer = document.getElementById('view-email-container');
             if (entry.email) {
                 eContainer.classList.remove('hidden');
@@ -1464,7 +1486,6 @@
                 eContainer.classList.add('hidden');
             }
 
-            // Password
             const pContainer = document.getElementById('view-password-container');
             if (entry.password) {
                 pContainer.classList.remove('hidden');
@@ -1473,14 +1494,7 @@
                 pContainer.classList.add('hidden');
             }
 
-            // Notes
-            const notesEl = document.getElementById('view-notes');
-            if (entry.notes) {
-                notesEl.textContent = entry.notes;
-            } else {
-                notesEl.textContent = "No extra notes recorded for this item.";
-            }
-
+            document.getElementById('view-notes').textContent = entry.notes || "No extra notes recorded for this item.";
             document.getElementById('view-modal').classList.remove('hidden');
             document.getElementById('view-modal').classList.add('flex');
         }
@@ -1500,7 +1514,6 @@
         function updateViewPasswordDisplay(password) {
             const passEl = document.getElementById('view-password');
             const iconEl = document.getElementById('view-pwd-toggle-icon');
-
             if (isViewPasswordVisible) {
                 passEl.textContent = password;
                 iconEl.className = 'fa-solid fa-eye-slash text-xs text-emerald-400';
@@ -1511,15 +1524,12 @@
         }
 
         function copyFieldFromView(fieldId, label) {
-            const val = document.getElementById(fieldId).textContent;
-            copyToClipboard(val, label);
+            copyToClipboard(document.getElementById(fieldId).textContent, label);
         }
 
         function copyPasswordFromView() {
             const entry = vaultEntries.find(e => e.id === currentViewingEntryId);
-            if (entry && entry.password) {
-                copyToClipboard(entry.password, "Password");
-            }
+            if (entry && entry.password) copyToClipboard(entry.password, "Password");
         }
 
         function editEntryFromView() {
@@ -1534,7 +1544,6 @@
             deleteEntry(id);
         }
 
-        // --- PASSWORD GENERATOR ---
         function openGeneratorModal() {
             updateGenerator();
             document.getElementById('generator-modal').classList.remove('hidden');
@@ -1560,7 +1569,6 @@
             if (useLower) chars += "abcdefghijklmnopqrstuvwxyz";
             if (useNums) chars += "0123456789";
             if (useSyms) chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
-
             if (!chars) chars = "abcdefghijklmnopqrstuvwxyz";
 
             let pwd = "";
@@ -1574,8 +1582,7 @@
         }
 
         function copyGeneratedPassword() {
-            const pwd = document.getElementById('gen-result').textContent;
-            copyToClipboard(pwd, "Generated password");
+            copyToClipboard(document.getElementById('gen-result').textContent, "Generated password");
         }
 
         function copyAndUseGeneratedPassword() {
@@ -1587,8 +1594,8 @@
             openGeneratorModal();
         }
 
-        // --- SETTINGS & BACKUP IMPORT/EXPORT ---
         function openSettingsModal() {
+            updateBackupReminderUI();
             document.getElementById('settings-modal').classList.remove('hidden');
             document.getElementById('settings-modal').classList.add('flex');
         }
@@ -1608,7 +1615,6 @@
                 showToast("Current master password incorrect!", "error");
                 return;
             }
-
             if (newPwd.length < 4) {
                 showToast("New password must be at least 4 chars.", "error");
                 return;
@@ -1616,7 +1622,6 @@
 
             const newHash = await hashPassword(newPwd);
             saveMasterHashToDualStorage(newHash);
-            
             document.getElementById('change-old-pwd').value = '';
             document.getElementById('change-new-pwd').value = '';
             showToast("Master Password updated successfully!");
@@ -1625,7 +1630,7 @@
         function exportVaultBackup() {
             const backupObj = {
                 app: "Shyan's Vault",
-                schemaVersion: 2,
+                schemaVersion: 2.1,
                 exportedAt: new Date().toISOString(),
                 entries: vaultEntries
             };
@@ -1638,6 +1643,8 @@
             downloadAnchor.click();
             downloadAnchor.remove();
 
+            saveLastBackupTimestamp(Date.now());
+            updateBackupReminderUI();
             showToast("Vault Backup Exported!");
         }
 
@@ -1650,11 +1657,9 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (imported && Array.isArray(imported.entries)) {
-                        // Merge imported entries into existing list without destroying current master password
                         const entryMap = new Map();
                         vaultEntries.forEach(item => entryMap.set(item.id, item));
                         imported.entries.forEach(item => entryMap.set(item.id || crypto.randomUUID(), item));
-                        
                         vaultEntries = Array.from(entryMap.values());
                         saveEntriesToDualStorage();
                         renderEntries();
@@ -1670,15 +1675,12 @@
             reader.readAsText(file);
         }
 
-        // --- CLIPBOARD & UTILITIES ---
         function copyToClipboard(text, label = "Text") {
             if (!text) return;
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast(`${label} copied to clipboard!`);
-                }).catch(() => {
-                    fallbackCopy(text, label);
-                });
+                navigator.clipboard.writeText(text)
+                    .then(() => showToast(`${label} copied to clipboard!`))
+                    .catch(() => fallbackCopy(text, label));
             } else {
                 fallbackCopy(text, label);
             }
@@ -1716,23 +1718,15 @@
         function showToast(message, type = "success") {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
             const isError = type === "error";
             const borderClass = isError ? "border-rose-500/40" : "border-emerald-500/40";
             const iconClass = isError ? "fa-circle-exclamation text-rose-400" : "fa-circle-check text-emerald-400";
 
             toast.className = `flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900/95 border ${borderClass} shadow-2xl backdrop-blur-md text-xs font-semibold text-slate-200 transform translate-y-2 opacity-0 transition-all duration-300 pointer-events-auto`;
-            toast.innerHTML = `
-                <i class="fa-solid ${iconClass} text-sm"></i>
-                <span>${escapeHTML(message)}</span>
-            `;
-
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-sm"></i><span>${escapeHTML(message)}</span>`;
             container.appendChild(toast);
 
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            });
-
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
@@ -1741,14 +1735,12 @@
 
         function escapeHTML(str) {
             if (!str) return '';
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
+            return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
 
         function escapeJs(str) {
             if (!str) return '';
-            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+            return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
         }
     </script>
 </body>
